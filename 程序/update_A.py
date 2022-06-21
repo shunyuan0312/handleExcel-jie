@@ -29,17 +29,22 @@ def update_table():
                     # D表M列，“已存在，无需装表”
                     d_ws['M' + str(i+2)] = "已存在，无需装表"
                     d_ws['M' + str(i+2)].alignment = alignment
+                # 如果A表的账户在B表中不存在
                 else:
+                    # 如果B表的身份证为空
                     if not b_id_cards_list[b_index]:
                         d_ws['L' + str(i+2)] = "空值"
                         d_ws['L' + str(i+2)].alignment = alignment
                         d_ws['M' + str(i+2)] = "数据异常，不予装表"
                         d_ws['M' + str(i+2)].alignment = alignment
+                    # B表的身份证不为空
                     else:
+                        # 判断D表的身份证和B表是否一致
                         if b_id_cards_list[b_index] == d_id_cards_list[i]:
+                            # 判断B表的状态是否为"关户"
                             if b_status_list[b_index] == "关户":
                                 a_sht2_max_row = a_sheet2.max_row
-                                # 复制A表sheet1的整行数据至A表sheet2，A表sheet2赋值I、J列为删除日期和B表对应状态
+                                # 复制A表sheet1的整行数据至A表sheet2，
                                 a_item_tuple = a_sheet1[a_index + 2]
                                 for j in range(len(a_item_tuple)):
                                     cell = a_item_tuple[j].value
@@ -49,6 +54,7 @@ def update_table():
                                 # 格式化A表sheet2的装表日期
                                 a_sheet2['H' + str(a_sht2_max_row+1)].number_format = 'yyyy/m/d'
                                 a_sheet2['H' + str(a_sht2_max_row+1)].alignment = alignment
+                                # A表sheet2赋值I、J列为删除日期和B表对应状态
                                 a_sheet2['I' + str(a_sht2_max_row+1)] = datetime.date(year,month,day)
                                 a_sheet2['I' + str(a_sht2_max_row+1)].number_format = 'yyyy/m/d'
                                 a_sheet2['I' + str(a_sht2_max_row+1)].alignment = alignment
@@ -59,8 +65,6 @@ def update_table():
                                 # 更新最大行数值
                                 a_sht1_max_row = a_sheet1.max_row
                                 # D表数据写入A表sheet1最后一行
-                                a_sheet1['A' + str(a_sht1_max_row+1)] = a_sht1_max_row + 1
-                                a_sheet1['A' + str(a_sht1_max_row+1)].alignment = alignment
                                 # A表B列代发单位 == D表J列代发单位
                                 a_sheet1['B' + str(a_sht1_max_row+1)] = d_ws['J' + str(i+2)].value
                                 a_sheet1['B' + str(a_sht1_max_row+1)].alignment = alignment
@@ -84,12 +88,15 @@ def update_table():
                                 a_sheet1['H' + str(a_sht1_max_row+1)].number_format = 'yyyy/m/d'
                                 a_sheet1['H' + str(a_sht1_max_row+1)].alignment = alignment
                                 # D表M列写入装表结果
+                                d_ws['L' + str(i+2)] = b_id_cards_list[b_index]
+                                d_ws['L' + str(i+2)].alignment = alignment
                                 d_ws['M' + str(i+2)] = '新装表'
                                 d_ws['M' + str(i+2)].alignment = alignment
                                 # 更新a表身份证列表和字典（删除一个，并增加一个）
                                 del a_id_cards_list[a_index]
                                 a_id_cards_list.append(a_sheet1['C' + str(a_sht1_max_row+1)])
                                 a_id_cards_dic = dict(zip(a_id_cards_list, [x for x in range(len(a_id_cards_list))]))
+                            # B表状态不是"关户"
                             else:
                                 # 如果D表的账号是6230开头，或者，D表的账号8开头且和B表账号一致，则更新A表
                                 if d_issue_account_list[i].startswith('6230') or (d_issue_account_list[i].startswith('8') and d_issue_account_list[i] == b_account_list[b_index]):
@@ -113,8 +120,6 @@ def update_table():
                                     a_sheet1.delete_rows(a_index + 2)
                                     a_sht1_max_row = a_sheet1.max_row
                                     # D表数据写入A表sheet1最后一行
-                                    a_sheet1['A' + str(a_sht1_max_row+1)] = a_sht1_max_row + 1
-                                    a_sheet1['A' + str(a_sht1_max_row+1)].alignment = alignment
                                     # A表B列代发单位 == D表J列代发单位
                                     a_sheet1['B' + str(a_sht1_max_row+1)] = d_ws['J' + str(i+2)].value
                                     a_sheet1['B' + str(a_sht1_max_row+1)].alignment = alignment
@@ -138,12 +143,15 @@ def update_table():
                                     a_sheet1['H' + str(a_sht1_max_row+1)].number_format = 'yyyy/m/d'
                                     a_sheet1['H' + str(a_sht1_max_row+1)].alignment = alignment
                                     # D表M列写入装表结果
+                                    d_ws['L' + str(i+2)] = b_id_cards_list[b_index]
+                                    d_ws['L' + str(i+2)].alignment = alignment
                                     d_ws['M' + str(i+2)] = '新装表'
                                     d_ws['M' + str(i+2)].alignment = alignment
                                     # 更新a表身份证列表和字典（删除一个，并增加一个）
                                     del a_id_cards_list[a_index]
                                     a_id_cards_list.append(a_sheet1['C' + str(a_sht1_max_row+1)])
                                     a_id_cards_dic = dict(zip(a_id_cards_list, [x for x in range(len(a_id_cards_list))]))                           
+                        # D表身份证和B表的不一致
                         else:
                             d_ws['L' + str(i+2)] = b_id_cards_list[b_index]
                             d_ws['L' + str(i+2)].alignment = alignment
@@ -153,6 +161,7 @@ def update_table():
             else:
                 d_ws['M' + str(i+2)] = "暂未提取到数据，不予装表"
                 d_ws['M' + str(i+2)].alignment = alignment
+        # D表身份证在A表查不到
         else:
             # 判断D表的代发账号是否在B表的三列（账号、卡号、旧帐号）数据中存在
             b_index = -1
@@ -173,8 +182,6 @@ def update_table():
                     if b_id_cards_list[b_index] == d_id_cards_list[i]:                                                
                         a_sht1_max_row = a_sheet1.max_row
                         # D表数据写入A表sheet1最后一行
-                        a_sheet1['A' + str(a_sht1_max_row+1)] = a_sht1_max_row + 1
-                        a_sheet1['A' + str(a_sht1_max_row+1)].alignment = alignment
                         # A表B列代发单位 == D表J列代发单位
                         a_sheet1['B' + str(a_sht1_max_row+1)] = d_ws['J' + str(i+2)].value
                         a_sheet1['B' + str(a_sht1_max_row+1)].alignment = alignment
@@ -198,6 +205,8 @@ def update_table():
                         a_sheet1['H' + str(a_sht1_max_row+1)].number_format = 'yyyy/m/d'
                         a_sheet1['H' + str(a_sht1_max_row+1)].alignment = alignment
                         # D表M列写入装表结果
+                        d_ws['L' + str(i+2)] = b_id_cards_list[b_index]
+                        d_ws['L' + str(i+2)].alignment = alignment
                         d_ws['M' + str(i+2)] = '新装表'
                         d_ws['M' + str(i+2)].alignment = alignment
                         # 更新a表身份证列表和字典（增加一个）
@@ -257,6 +266,7 @@ if __name__ == '__main__':
     a_table = load_workbook(a_file_path)
     a_sheet1 = a_table[a_sht1_name]
     a_sheet2 = a_table[a_sht2_name]
+
     a_id_cards_tuple = a_sheet1['C'][1:]
     a_issue_account_tuple = a_sheet1['D'][1:]
     a_id_cards_list = []
